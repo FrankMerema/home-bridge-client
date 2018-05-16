@@ -1,0 +1,25 @@
+{
+    "name": "switch-on-off-raspberry",
+    "version": "0.0.1",
+    "description": "Turning switch a-like components on and off, on a raspbery pi",
+    "main": "dist/index.js",
+    "author": "Frank Merema",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc",
+        "start": "node -r ts-node/register src/start.ts"
+    },
+    "devDependencies": {
+        "@types/express": "4.11.1",
+        "@types/node": "9.6.4",
+        "ts-node": "6.0.3",
+        "typescript": "2.8.3"
+    },
+    "dependencies": {
+        "axios": "0.18.0",
+        "body-parser": "1.18.2",
+        "epoll": "2.0.1",
+        "express": "4.16.3",
+        "onoff": "3.0.2"
+    }
+}
