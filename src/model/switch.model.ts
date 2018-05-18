@@ -1,16 +1,14 @@
 import { State } from './state.enum';
 
-export interface StateHistory {
-    state: State;
-    executed: Date;
-    executedBy: String;
-}
-
-export interface SwitchModel {
-    name: string;
+interface BaseModel {
     pin: number;
     direction: string;
     state: State;
-    stateHistory: Array<StateHistory>;
-    created: Date;
+}
+
+export interface SwitchModel extends BaseModel {
+}
+
+export interface SensorModel extends BaseModel {
+
 }

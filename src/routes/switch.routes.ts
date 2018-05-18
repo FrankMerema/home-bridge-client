@@ -50,9 +50,8 @@ export class SwitchRoutes {
 
     private addSwitch(req: Request, res: Response): void {
         const pin = req.body.pin;
-        const direction = req.body.direction;
 
-        this.switchHandler.addSwitch(pin, direction)
+        this.switchHandler.addSwitch(pin)
             .then((s: any) => {
                 res.json(s);
             }).catch(error => {
