@@ -1,7 +1,7 @@
 {
-    "name": "switch-on-off-raspberry",
+    "name": "home-bridge-client",
     "version": "0.0.1",
-    "description": "Turning switch a-like components on and off, on a raspbery pi",
+    "description": "Raspberry Pi client for the FrankMerema/home-bridge",
     "main": "dist/index.js",
     "author": "Frank Merema",
     "license": "MIT",
@@ -16,7 +16,6 @@
         "typescript": "2.8.3"
     },
     "dependencies": {
-        "abstract-database": "^0.0.4",
         "axios": "0.18.0",
         "body-parser": "1.18.2",
         "epoll": "2.0.1",
