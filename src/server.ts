@@ -32,7 +32,7 @@ export function start() {
 
     function setServerToOnline(host: { host: string, ip: string, port: number }) {
         axios.post(`${config.homeServerHost}/api/host`, host)
-            .catch(error => {
+            .catch((error) => {
                 console.error(`Error posting host: ${error.message}`);
                 setTimeout(() => setServerToOnline(host), 2000);
             });

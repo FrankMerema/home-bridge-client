@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { createGpio, destoryGpio, readPinState, watchPinState } from '../helpers/gpio-helper';
+import { createGpio, readPinState, watchPinState } from '../helpers/gpio-helper';
 import { getOwnIp } from '../helpers/network-helper';
 import { State } from '../model/state.enum';
 import { SensorModel } from '../model/switch.model';
@@ -11,7 +11,7 @@ export class SensorHandler {
     private sensorList: { [key: number]: any } = {};
 
     constructor() {
-        // DO CALL TO HOME SERVER AND ASK FOR SWITCHES
+        // DO CALL HOME SERVER AND ASK FOR SWITCHES
         this.getInitialState();
     }
 
@@ -24,21 +24,18 @@ export class SensorHandler {
             return Promise.reject({error: `Already a sensor registered to this pin: ${pin}!`});
         }
 
-        return createGpio(pin, 'in', State.OFF, 'both')
+        return createGpio(pin, 'in', 'both')
             .then((gpio: any) => {
                 this.sensorList[pin] = gpio;
-                watchPinState(gpio, pin, (error, newValue, pin) => this.stateChanged(error, newValue, pin));
+                watchPinState(gpio, pin, (newValue, pin) => this.stateChanged(newValue, pin));
 
                 return Promise.resolve({pin: pin, state: State.OFF});
             });
     }
 
     removeSensor(pin: number): Promise<any> {
-        return destoryGpio(this.sensorList[pin])
-            .then(() => {
-                delete this.sensorList[pin];
-                return Promise.resolve();
-            });
+        delete this.sensorList[pin];
+        return Promise.resolve();
     }
 
     getStateOfSensor(pin: number): Promise<any> {
@@ -53,10 +50,10 @@ export class SensorHandler {
         axios.get(`${config.homeServerHost}/api/sensor/all/${getOwnIp()}/${config.port || 3000}`)
             .then(res => {
                 res.data.forEach((s: SensorModel) => {
-                    createGpio(s.pin, 'in', s.state, 'both')
+                    createGpio(s.pin, 'in', 'both')
                         .then((gpio: any) => {
                             this.sensorList[s.pin] = gpio;
-                            watchPinState(gpio, s.pin, (error, newValue, pin) => this.stateChanged(error, newValue, pin));
+                            watchPinState(gpio, s.pin, (newValue, pin) => this.stateChanged(newValue, pin));
                         });
                 });
             }).catch(error => {
@@ -65,16 +62,11 @@ export class SensorHandler {
         });
     }
 
-    private stateChanged(error: Error, newValue: number, pin: number): void {
-        if (!error) {
-            axios.put(`${config.homeServerHost}/api/sensor/${getOwnIp()}/${config.port || 3000}/${pin}`, {state: newValue})
-                .catch((error) => {
-                    console.log(error);
-                    this.errorHandler(error);
-                });
-        } else {
-            console.error(error);
-        }
+    private stateChanged(newValue: number, pin: number): void {
+        axios.put(`${config.homeServerHost}/api/sensor/${getOwnIp()}/${config.port || 3000}/${pin}`, {state: newValue})
+            .catch((error) => {
+                this.errorHandler(error);
+            });
     }
 
     private errorHandler(error: AxiosError): void {

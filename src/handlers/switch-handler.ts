@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { createGpio, destoryGpio, readPinState, writePinState } from '../helpers/gpio-helper';
+import { createGpio, readPinState, writePinState } from '../helpers/gpio-helper';
 import { getOwnIp } from '../helpers/network-helper';
 import { State } from '../model/state.enum';
 import { SwitchModel } from '../model/switch.model';
@@ -11,7 +11,7 @@ export class SwitchHandler {
     private switchList: { [key: number]: any } = {};
 
     constructor() {
-        // DO CALL TO HOME SERVER AND ASK FOR SWITCHES
+        // DO CALL HOME SERVER AND ASK FOR SWITCHES
         this.getInitialState();
     }
 
@@ -24,7 +24,7 @@ export class SwitchHandler {
             return Promise.reject({error: `Already a switch registered to this pin: ${pin}!`});
         }
 
-        return createGpio(pin, 'out', State.OFF)
+        return createGpio(pin, 'out')
             .then((gpio: any) => {
                 this.switchList[pin] = gpio;
                 return writePinState(gpio, State.OFF)
@@ -35,12 +35,9 @@ export class SwitchHandler {
     }
 
 
-    removeSwitch(pin: number): Promise<any> {
-        return destoryGpio(this.switchList[pin])
-            .then(() => {
-                delete this.switchList[pin];
-                return Promise.resolve();
-            });
+    removeSwitch(pin: number): Promise<void> {
+        delete this.switchList[pin];
+        return Promise.resolve();
     }
 
     getStateOfSwitch(pin: number): Promise<any> {
@@ -63,7 +60,7 @@ export class SwitchHandler {
         axios.get(`${config.homeServerHost}/api/switch/all/${getOwnIp()}/${config.port || 3000}`)
             .then(res => {
                 res.data.forEach((s: SwitchModel) => {
-                    createGpio(s.pin, 'out', s.state)
+                    createGpio(s.pin, 'out')
                         .then((gpio: any) => {
                             this.switchList[s.pin] = gpio;
                             writePinState(gpio, s.state);
@@ -83,7 +80,3 @@ export class SwitchHandler {
         }
     }
 }
-
-
-// watch on changes, if change notify hub
-// hub notify connected switch
