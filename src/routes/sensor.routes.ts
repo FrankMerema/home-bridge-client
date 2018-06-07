@@ -6,9 +6,9 @@ export class SensorRoutes {
     private readonly router: Router;
     private sensorHandler: SensorHandler;
 
-    constructor() {
+    constructor(sensorHandler: SensorHandler) {
         this.router = Router();
-        this.sensorHandler = new SensorHandler();
+        this.sensorHandler = sensorHandler;
         this.setupRoutes();
     }
 

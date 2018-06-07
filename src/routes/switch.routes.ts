@@ -6,9 +6,9 @@ export class SwitchRoutes {
     private readonly router: Router;
     private switchHandler: SwitchHandler;
 
-    constructor() {
+    constructor(switchHandler: SwitchHandler) {
         this.router = Router();
-        this.switchHandler = new SwitchHandler();
+        this.switchHandler = switchHandler;
         this.setupRoutes();
     }
 

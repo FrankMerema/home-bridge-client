@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { createGpio, readPinState, watchPinState } from '../helpers/gpio-helper';
-import { getOwnIp } from '../helpers/network-helper';
+import { HostModel } from '../model/host.model';
 import { State } from '../model/state.enum';
 import { SensorModel } from '../model/switch.model';
 
@@ -9,8 +9,10 @@ const config = require('../../service.config.json');
 export class SensorHandler {
 
     private sensorList: { [key: number]: any } = {};
+    private readonly host: HostModel;
 
-    constructor() {
+    constructor(host: HostModel) {
+        this.host = host;
         // DO CALL HOME SERVER AND ASK FOR SWITCHES
         this.getInitialState();
     }
@@ -47,7 +49,7 @@ export class SensorHandler {
     }
 
     private getInitialState(): void {
-        axios.get(`${config.homeServerHost}/api/sensor/all/${getOwnIp()}/${config.port || 3000}`)
+        axios.get(`${config.homeServerHost}/api/sensor/all/${this.host.id}`)
             .then(res => {
                 res.data.forEach((s: SensorModel) => {
                     createGpio(s.pin, 'in', 'both')
@@ -58,12 +60,12 @@ export class SensorHandler {
                 });
             }).catch(error => {
             this.errorHandler(error);
-            setTimeout(() => this.getInitialState(), Math.floor(Math.random() * 60000));
+            setTimeout(() => this.getInitialState(), 3000);
         });
     }
 
     private stateChanged(newValue: number, pin: number): void {
-        axios.put(`${config.homeServerHost}/api/sensor/${getOwnIp()}/${config.port || 3000}/${pin}`, {state: newValue})
+        axios.put(`${config.homeServerHost}/api/sensor/${this.host.id}/${pin}`, {state: newValue})
             .catch((error) => {
                 this.errorHandler(error);
             });
@@ -71,7 +73,7 @@ export class SensorHandler {
 
     private errorHandler(error: AxiosError): void {
         if (error.response && error.response.data) {
-            console.error(error.response.data.error);
+            console.error(`Error: ${error.response.data.error}`);
         } else {
             console.error(`Error: ${error.message}`);
         }

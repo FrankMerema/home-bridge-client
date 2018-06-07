@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { createGpio, readPinState, writePinState } from '../helpers/gpio-helper';
-import { getOwnIp } from '../helpers/network-helper';
+import { HostModel } from '../model/host.model';
 import { State } from '../model/state.enum';
 import { SwitchModel } from '../model/switch.model';
 
@@ -9,8 +9,10 @@ const config = require('../../service.config.json');
 export class SwitchHandler {
 
     private switchList: { [key: number]: any } = {};
+    private readonly host: HostModel;
 
-    constructor() {
+    constructor(host: HostModel) {
+        this.host = host;
         // DO CALL HOME SERVER AND ASK FOR SWITCHES
         this.getInitialState();
     }
@@ -27,10 +29,9 @@ export class SwitchHandler {
         return createGpio(pin, 'out')
             .then((gpio: any) => {
                 this.switchList[pin] = gpio;
-                return writePinState(gpio, State.OFF)
-                    .then(() => {
-                        return Promise.resolve({pin: pin, state: State.OFF});
-                    });
+                this.switchAddingAnimation(gpio);
+
+                return Promise.resolve({pin: pin, state: State.OFF});
             });
     }
 
@@ -57,7 +58,7 @@ export class SwitchHandler {
     }
 
     private getInitialState(): void {
-        axios.get(`${config.homeServerHost}/api/switch/all/${getOwnIp()}/${config.port || 3000}`)
+        axios.get(`${config.homeServerHost}/api/switch/all/${this.host.id}`)
             .then(res => {
                 res.data.forEach((s: SwitchModel) => {
                     createGpio(s.pin, 'out')
@@ -74,9 +75,29 @@ export class SwitchHandler {
 
     private errorHandler(error: AxiosError): void {
         if (error.response && error.response.data) {
-            console.error(error.response.data.error);
+            console.error(`Error: ${error.response.data.error}`);
         } else {
             console.error(`Error: ${error.message}`);
         }
+    }
+
+    private switchAddingAnimation(gpio: any): void {
+        writePinState(gpio, State.OFF)
+            .then(() => this.timeoutHandler(1000))
+            .then(() => writePinState(gpio, State.ON))
+            .then(() => this.timeoutHandler(1000))
+            .then(() => writePinState(gpio, State.OFF))
+            .then(() => this.timeoutHandler(1000))
+            .then(() => writePinState(gpio, State.ON))
+            .then(() => this.timeoutHandler(1000))
+            .then(() => writePinState(gpio, State.OFF));
+    }
+
+    private timeoutHandler(ms: number): Promise<any> {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve();
+            }, ms);
+        });
     }
 }
