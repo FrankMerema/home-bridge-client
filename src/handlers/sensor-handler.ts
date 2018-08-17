@@ -1,4 +1,5 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
+import { errorHandler } from '../helpers/error-helper';
 import { createGpio, readPinState, watchPinState } from '../helpers/gpio-helper';
 import { HostModel } from '../model/host.model';
 import { State } from '../model/state.enum';
@@ -49,7 +50,7 @@ export class SensorHandler {
     }
 
     private getInitialState(): void {
-        axios.get(`${config.homeServerHost}/api/sensor/all/${this.host.id}`)
+        axios.get(`${config.homeServerHost}/api/server/sensor/all/${this.host.id}`)
             .then(res => {
                 res.data.forEach((s: SensorModel) => {
                     createGpio(s.pin, 'in', 'both')
@@ -59,23 +60,15 @@ export class SensorHandler {
                         });
                 });
             }).catch(error => {
-            this.errorHandler(error);
+            errorHandler(error);
             setTimeout(() => this.getInitialState(), 3000);
         });
     }
 
     private stateChanged(newValue: number, pin: number): void {
-        axios.put(`${config.homeServerHost}/api/sensor/${this.host.id}/${pin}`, {state: newValue})
+        axios.put(`${config.homeServerHost}/api/server/sensor/${this.host.id}/${pin}`, {state: newValue})
             .catch((error) => {
-                this.errorHandler(error);
+                errorHandler(error);
             });
-    }
-
-    private errorHandler(error: AxiosError): void {
-        if (error.response && error.response.data) {
-            console.error(`Error: ${error.response.data.error}`);
-        } else {
-            console.error(`Error: ${error.message}`);
-        }
     }
 }

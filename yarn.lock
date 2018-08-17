@@ -46,12 +46,6 @@
   version "9.6.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.4.tgz#0ef7b4cfc3499881c81e0ea1ce61a23f6f4f5b42"
 
-"@types/pigpio@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@types/pigpio/-/pigpio-0.4.1.tgz#e2c169b3d221bb033eace642368c181968dfec0e"
-  dependencies:
-    "@types/node" "*"
-
 "@types/serve-static@*":
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.2.tgz#f5ac4d7a6420a99a6a45af4719f4dcd8cd907a48"
@@ -86,10 +80,6 @@ axios@0.18.0:
   dependencies:
     follow-redirects "^1.3.0"
     is-buffer "^1.1.5"
-
-bindings@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.3.0.tgz#b346f6ecf6a95f5a815c5839fc7cdb22502f1ed7"
 
 body-parser@1.18.2:
   version "1.18.2"
@@ -183,13 +173,6 @@ ee-first@1.1.1:
 encodeurl@~1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
-
-epoll@2.0.1, epoll@^2.0.1:
-  version "2.0.1"
-  resolved "https://npmjs.build.edubase.malmberg.nl/repository/npm/epoll/-/epoll-2.0.1.tgz#4742f963048fab6ad4347f678b0e9e38d58a417e"
-  dependencies:
-    bindings "^1.3.0"
-    nan "^2.10.0"
 
 escape-html@~1.0.3:
   version "1.0.3"
@@ -302,10 +285,6 @@ is-buffer@^1.1.5:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
 
-lodash.debounce@^4.0.8:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
-
 make-error@^1.1.1:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/make-error/-/make-error-1.3.4.tgz#19978ed575f9e9545d2ff8c13e33b5d18a67d535"
@@ -354,10 +333,6 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-nan@^2.10.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
-
 negotiator@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
@@ -368,13 +343,6 @@ on-finished@~2.3.0:
   dependencies:
     ee-first "1.1.1"
 
-onoff@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/onoff/-/onoff-3.0.2.tgz#af8a20017fdc96b4c7a6f637e1c7f2129516c96f"
-  dependencies:
-    epoll "^2.0.1"
-    lodash.debounce "^4.0.8"
-
 parseurl@~1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.2.tgz#fc289d4ed8993119460c156253262cdc8de65bf3"
@@ -383,7 +351,7 @@ path-to-regexp@0.1.7:
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-0.1.7.tgz#df604178005f522f15eb4490e7247a1bfaa67f8c"
 
-pigpio-mock@^0.0.1:
+pigpio-mock@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/pigpio-mock/-/pigpio-mock-0.0.1.tgz#5e5b3fd74987b6bfcc653b2de1219aeabbb0dcb8"
 

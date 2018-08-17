@@ -1,4 +1,5 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
+import { errorHandler } from '../helpers/error-helper';
 import { createGpio, readPinState, writePinState } from '../helpers/gpio-helper';
 import { HostModel } from '../model/host.model';
 import { State } from '../model/state.enum';
@@ -58,7 +59,7 @@ export class SwitchHandler {
     }
 
     private getInitialState(): void {
-        axios.get(`${config.homeServerHost}/api/switch/all/${this.host.id}`)
+        axios.get(`${config.homeServerHost}/api/server/switch/all/${this.host.id}`)
             .then(res => {
                 res.data.forEach((s: SwitchModel) => {
                     createGpio(s.pin, 'out')
@@ -68,17 +69,9 @@ export class SwitchHandler {
                         });
                 });
             }).catch(error => {
-            this.errorHandler(error);
+            errorHandler(error);
             setTimeout(() => this.getInitialState(), 2000);
         });
-    }
-
-    private errorHandler(error: AxiosError): void {
-        if (error.response && error.response.data) {
-            console.error(`Error: ${error.response.data.error}`);
-        } else {
-            console.error(`Error: ${error.message}`);
-        }
     }
 
     private switchAddingAnimation(gpio: any): void {

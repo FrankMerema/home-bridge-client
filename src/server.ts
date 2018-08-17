@@ -26,7 +26,7 @@ export function start() {
     app.listen(port, () => {
         console.log(`Express app listening on port ${port}!`);
 
-        const host = {host: getOwnHostname(), ip: getOwnIp(), port: port};
+        const host = {host: getOwnHostname(), name: config.name, ip: getOwnIp(), port: port};
 
         setServerToOnline(host, (host: HostModel) => {
             const switchHandler = new SwitchHandler(host);
@@ -38,7 +38,7 @@ export function start() {
     });
 
     function setServerToOnline(host: { host: string, ip: string, port: number }, callback: (host: HostModel) => void) {
-        axios.post(`${config.homeServerHost}/api/host`, host)
+        axios.post(`${config.homeServerHost}/api/server/host`, host)
             .then(response => {
                 host = response.data;
                 callback(response.data);
@@ -50,19 +50,19 @@ export function start() {
     }
 
     process.on('SIGINT', () => {
-        axios.post(`${config.homeServerHost}/api/host/${getOwnIp()}/status`, {status: 'offline'})
+        axios.post(`${config.homeServerHost}/api/server/host/${getOwnIp()}/status`, {status: 'offline'})
             .then(() => process.exit(200))
             .catch(() => process.exit(404));
     });
 
     process.on('SIGTERM', () => {
-        axios.post(`${config.homeServerHost}/api/host/${getOwnIp()}/status`, {status: 'offline'})
+        axios.post(`${config.homeServerHost}/api/server/host/${getOwnIp()}/status`, {status: 'offline'})
             .then(() => process.exit(200))
             .catch(() => process.exit(404));
     });
 
     process.on('SIGCHLD', () => {
-        axios.post(`${config.homeServerHost}/api/host/${getOwnIp()}/status`, {status: 'offline'})
+        axios.post(`${config.homeServerHost}/api/server/host/${getOwnIp()}/status`, {status: 'offline'})
             .then(() => process.exit(200))
             .catch(() => process.exit(404));
     });
