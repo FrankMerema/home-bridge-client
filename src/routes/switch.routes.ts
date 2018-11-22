@@ -29,11 +29,11 @@ export class SwitchRoutes {
         const pin = req.params.pin;
 
         this.switchHandler.getStateOfSwitch(pin)
-            .then(state => {
+            .subscribe(state => {
                 res.json({state: state});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private changeState(req: Request, res: Response): void {
@@ -41,29 +41,29 @@ export class SwitchRoutes {
         const state = req.body.state;
 
         this.switchHandler.changeState(pin, state)
-            .then(() => {
+            .subscribe(() => {
                 res.json({});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private addSwitch(req: Request, res: Response): void {
         const pin = req.body.pin;
 
         this.switchHandler.addSwitch(pin)
-            .then((s: any) => {
+            .subscribe((s: any) => {
                 res.json(s);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private removeSwitch(req: Request, res: Response): void {
         const pin = req.params.pin;
 
         this.switchHandler.removeSwitch(pin)
-            .then(() => {
+            .subscribe(() => {
                 res.json({});
             });
     }

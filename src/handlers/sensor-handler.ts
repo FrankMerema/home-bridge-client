@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { Observable, of, throwError } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { errorHandler } from '../helpers/error-helper';
 import { createGpio, readPinState, watchPinState } from '../helpers/gpio-helper';
 import { HostModel } from '../model/host.model';
@@ -18,43 +20,44 @@ export class SensorHandler {
         this.getInitialState();
     }
 
-    addSensor(pin: number): Promise<any> {
+    addSensor(pin: number): Observable<{ pin: number, state: State }> {
         if (!pin) {
-            return Promise.reject({error: 'Should set the input pin!'});
+            return throwError('Should set the input pin!');
         }
 
         if (this.sensorList[pin] !== undefined) {
-            return Promise.reject({error: `Already a sensor registered to this pin: ${pin}!`});
+            return throwError(`Already a sensor registered to this pin: ${pin}!`);
         }
 
         return createGpio(pin, 'in', 'both')
-            .then((gpio: any) => {
+            .pipe(map((gpio: any) => {
                 this.sensorList[pin] = gpio;
                 watchPinState(gpio, pin, (newValue, pin) => this.stateChanged(newValue, pin));
 
-                return Promise.resolve({pin: pin, state: State.OFF});
-            });
+                return {pin: pin, state: State.OFF};
+            }));
     }
 
-    removeSensor(pin: number): Promise<any> {
+    removeSensor(pin: number): Observable<null> {
         delete this.sensorList[pin];
-        return Promise.resolve();
+
+        return of(null);
     }
 
-    getStateOfSensor(pin: number): Promise<any> {
+    getStateOfSensor(pin: number): Observable<number> {
         if (this.sensorList[pin]) {
             return readPinState(this.sensorList[pin]);
         } else {
-            return Promise.reject({error: `No sensor for pin: ${pin}`});
+            return throwError(`No sensor for pin: ${pin}`);
         }
     }
 
     private getInitialState(): void {
         axios.get(`${config.homeServerHost}/api/server/sensor/all/${this.host.id}`)
-            .then(res => {
-                res.data.forEach((s: SensorModel) => {
+            .then(response => {
+                response.data.forEach((s: SensorModel) => {
                     createGpio(s.pin, 'in', 'both')
-                        .then((gpio: any) => {
+                        .subscribe((gpio: any) => {
                             this.sensorList[s.pin] = gpio;
                             watchPinState(gpio, s.pin, (newValue, pin) => this.stateChanged(newValue, pin));
                         });

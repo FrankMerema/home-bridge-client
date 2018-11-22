@@ -28,29 +28,29 @@ export class SensorRoutes {
         const pin = req.params.pin;
 
         this.sensorHandler.getStateOfSensor(pin)
-            .then(state => {
+            .subscribe(state => {
                 res.json({state: state});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private addSensor(req: Request, res: Response): void {
         const pin = req.body.pin;
 
         this.sensorHandler.addSensor(pin)
-            .then((s: any) => {
+            .subscribe((s: any) => {
                 res.json(s);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private removeSensor(req: Request, res: Response): void {
         const pin = req.params.pin;
 
         this.sensorHandler.removeSensor(pin)
-            .then(() => {
+            .subscribe(() => {
                 res.json({});
             });
     }

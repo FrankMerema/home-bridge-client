@@ -1,9 +1,10 @@
+import { Observable, of } from 'rxjs';
 import { GpioDirection, GpioEdgeType, GpioOptions } from '../model/gpio-options.model';
 import { State } from '../model/state.enum';
 
-const GPIO = require('pigpio').Gpio;
+const GPIO = require('pigpio-mock').Gpio;
 
-export function createGpio(pin: number, direction: GpioDirection, edge?: GpioEdgeType): Promise<any> {
+export function createGpio(pin: number, direction: GpioDirection, edge?: GpioEdgeType): Observable<any> {
     const config: GpioOptions = {};
     config.mode = direction === 'in' ? GPIO.INPUT : GPIO.OUTPUT;
     switch (edge) {
@@ -22,19 +23,20 @@ export function createGpio(pin: number, direction: GpioDirection, edge?: GpioEdg
     }
 
     const g = new GPIO(pin, config);
-    return Promise.resolve(g);
+
+    return of(g);
 }
 
-export function readPinState(gpio: any): Promise<number> {
-    return Promise.resolve(gpio.digitalRead());
+export function readPinState(gpio: any): Observable<number> {
+    return of(gpio.digitalRead());
 }
 
-export function writePinState(gpio: any, state: State): Promise<void> {
-    return Promise.resolve(gpio.digitalWrite(state));
+export function writePinState(gpio: any, state: State): Observable<void> {
+    return of(gpio.digitalWrite(state));
 }
 
 export function watchPinState(gpio: any, pin: number, callback: (valueChanged: number, pin: number) => void): void {
-    gpio.on('interrupt', (level: number) => {
-        callback(level, pin);
-    });
+    // gpio.on('interrupt', (level: number) => {
+    //     callback(level, pin);
+    // });
 }

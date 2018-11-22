@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { Observable, of, throwError } from 'rxjs';
+import { map, switchMap, timeout } from 'rxjs/operators';
 import { errorHandler } from '../helpers/error-helper';
 import { createGpio, readPinState, writePinState } from '../helpers/gpio-helper';
 import { HostModel } from '../model/host.model';
@@ -18,43 +20,44 @@ export class SwitchHandler {
         this.getInitialState();
     }
 
-    addSwitch(pin: number): Promise<any> {
+    addSwitch(pin: number): Observable<any> {
         if (!pin) {
-            return Promise.reject({error: 'Should set the output pin!'});
+            return throwError('Should set the output pin!');
         }
 
         if (this.switchList[pin] !== undefined) {
-            return Promise.reject({error: `Already a switch registered to this pin: ${pin}!`});
+            return throwError(`Already a switch registered to this pin: ${pin}!`);
         }
 
         return createGpio(pin, 'out')
-            .then((gpio: any) => {
+            .pipe(map((gpio: any) => {
                 this.switchList[pin] = gpio;
                 this.switchAddingAnimation(gpio);
 
-                return Promise.resolve({pin: pin, state: State.OFF});
-            });
+                return {pin: pin, state: State.OFF};
+            }));
     }
 
 
-    removeSwitch(pin: number): Promise<void> {
+    removeSwitch(pin: number): Observable<null> {
         delete this.switchList[pin];
-        return Promise.resolve();
+
+        return of(null);
     }
 
-    getStateOfSwitch(pin: number): Promise<any> {
+    getStateOfSwitch(pin: number): Observable<any> {
         if (this.switchList[pin]) {
             return readPinState(this.switchList[pin]);
         } else {
-            return Promise.reject({error: `No switch for pin: ${pin}`});
+            return throwError(`No switch for pin: ${pin}`);
         }
     }
 
-    changeState(pin: number, state: State): Promise<any> {
+    changeState(pin: number, state: State): Observable<any> {
         if (this.switchList[pin]) {
             return writePinState(this.switchList[pin], state);
         } else {
-            return Promise.reject({error: `No switch for pin: ${pin}`});
+            return throwError(`No switch for pin: ${pin}`);
         }
     }
 
@@ -63,9 +66,10 @@ export class SwitchHandler {
             .then(res => {
                 res.data.forEach((s: SwitchModel) => {
                     createGpio(s.pin, 'out')
-                        .then((gpio: any) => {
+                        .subscribe((gpio: any) => {
                             this.switchList[s.pin] = gpio;
-                            writePinState(gpio, s.state);
+                            writePinState(gpio, s.state)
+                                .subscribe();
                         });
                 });
             }).catch(error => {
@@ -76,21 +80,14 @@ export class SwitchHandler {
 
     private switchAddingAnimation(gpio: any): void {
         writePinState(gpio, State.OFF)
-            .then(() => this.timeoutHandler(1000))
-            .then(() => writePinState(gpio, State.ON))
-            .then(() => this.timeoutHandler(1000))
-            .then(() => writePinState(gpio, State.OFF))
-            .then(() => this.timeoutHandler(1000))
-            .then(() => writePinState(gpio, State.ON))
-            .then(() => this.timeoutHandler(1000))
-            .then(() => writePinState(gpio, State.OFF));
-    }
-
-    private timeoutHandler(ms: number): Promise<any> {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve();
-            }, ms);
-        });
+            .pipe(
+                timeout(1000),
+                switchMap(() => writePinState(gpio, State.ON)),
+                timeout(1000),
+                switchMap(() => writePinState(gpio, State.OFF)),
+                timeout(1000),
+                switchMap(() => writePinState(gpio, State.ON)),
+                timeout(1000),
+                switchMap(() => writePinState(gpio, State.OFF)));
     }
 }

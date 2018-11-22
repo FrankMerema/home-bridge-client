@@ -14,7 +14,6 @@ const config = require('../service.config.json');
 
 export function start() {
     const port = config.port || 3000;
-    let host: HostModel;
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
@@ -42,11 +41,10 @@ export function start() {
             .then(response => {
                 host = response.data;
                 callback(response.data);
-            })
-            .catch((error) => {
-                console.error(`Error posting host: ${error.message}`);
-                setTimeout(() => setServerToOnline(host, callback), 2000);
-            });
+            }).catch(error => {
+            console.error(`Error posting host: ${error}`);
+            setTimeout(() => setServerToOnline(host, callback), 2000);
+        });
     }
 
     process.on('SIGINT', () => {
