@@ -1,6 +1,5 @@
+import { GpioDirection, GpioEdgeType, GpioOptions, State } from '@shared/models';
 import { Observable, of } from 'rxjs';
-import { GpioDirection, GpioEdgeType, GpioOptions } from '../model/gpio-options.model';
-import { State } from '../model/state.enum';
 
 const GPIO = require('pigpio-mock').Gpio;
 

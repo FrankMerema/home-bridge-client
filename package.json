@@ -1,25 +1,69 @@
 {
-    "name": "home-bridge-client",
-    "version": "0.0.1",
-    "description": "Raspberry Pi client for the FrankMerema/home-bridge",
-    "main": "dist/index.js",
-    "author": "Frank Merema",
-    "license": "MIT",
-    "scripts": {
-        "build": "tsc",
-        "start": "node -r ts-node/register src/start.ts"
+  "name": "home-bridge-client",
+  "version": "0.0.1",
+  "description": "Raspberry Pi client for the FrankMerema/home-bridge",
+  "author": "Frank Merema",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:dev": "nodemon",
+    "start:debug": "nodemon --config nodemon-debug.json",
+    "prestart:prod": "rimraf dist && npm run build",
+    "start:prod": "node dist/main.js",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "dependencies": {
+    "@nestjs/common": "6.1.1",
+    "@nestjs/core": "6.1.1",
+    "@nestjs/microservices": "6.1.1",
+    "@nestjs/platform-express": "6.1.1",
+    "cookie-parser": "1.4.4",
+    "express-rate-limit": "3.5.0",
+    "express-session": "1.16.1",
+    "helmet": "3.16.0",
+    "reflect-metadata": "0.1.13",
+    "rimraf": "2.6.3",
+    "rxjs": "6.5.1"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "6.1.1",
+    "@types/express": "4.16.1",
+    "@types/express-rate-limit": "3.3.0",
+    "@types/express-session": "1.15.12",
+    "@types/helmet": "0.0.43",
+    "@types/jest": "24.0.12",
+    "@types/node": "11.13.8",
+    "@types/supertest": "2.0.7",
+    "jest": "24.7.1",
+    "nodemon": "1.18.11",
+    "pigpio-mock": "0.0.1",
+    "prettier": "1.17.0",
+    "supertest": "4.0.2",
+    "ts-jest": "24.0.2",
+    "ts-node": "8.1.0",
+    "tsconfig-paths": "3.8.0",
+    "tslint": "5.16.0",
+    "typescript": "3.4.5"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".spec.ts$",
+    "transform": {
+      ".+\\.(t|j)s$": "ts-jest"
     },
-    "devDependencies": {
-        "@types/express": "4.11.1",
-        "@types/node": "9.6.4",
-        "ts-node": "6.0.3",
-        "typescript": "2.8.3"
-    },
-    "dependencies": {
-        "axios": "0.18.0",
-        "body-parser": "1.18.2",
-        "express": "4.16.3",
-        "pigpio-mock": "0.0.1",
-        "rxjs": "^6.3.3"
-    }
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
 }

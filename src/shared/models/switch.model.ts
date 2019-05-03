@@ -1,6 +1,6 @@
 import { State } from './state.enum';
 
-interface BaseModel {
+export interface BaseModel {
     pin: number;
     direction: string;
     state: State;

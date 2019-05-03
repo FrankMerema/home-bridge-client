@@ -1,13 +1,30 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "target": "es6",
-        "noImplicitAny": true,
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "outDir": "dist",
-        "baseUrl": "./src",
-        "lib": ["es2017"]
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es6",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "src",
+    "paths": {
+      "@shared/models": [
+        "shared/models"
+      ],
+      "@shared/service": [
+        "shared/services"
+      ],
+      "@shared/helpers": [
+        "shared/helpers"
+      ],
+      "@config": [
+        "config"
+      ]
     }
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }
