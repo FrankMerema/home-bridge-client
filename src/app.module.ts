@@ -1,12 +1,11 @@
-import { ConfigModule } from '@config';
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { ServiceModule } from '@shared/service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
     imports: [
-        ConfigModule,
-        HttpModule
+        ServiceModule.forRoot()
     ],
     controllers: [
         AppController
