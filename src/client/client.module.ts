@@ -5,7 +5,7 @@ import { SwitchController } from './switch/switch.controller';
 
 @Module({
     imports: [
-        ServiceModule.forChild()
+        ServiceModule
     ],
     controllers: [
         SensorController,

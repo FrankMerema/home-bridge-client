@@ -1,18 +1,17 @@
-import { HttpService, Injectable, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
+import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import { HostService } from '@shared/service';
 
 @Injectable()
-export class AppService implements OnApplicationBootstrap, OnApplicationShutdown {
+export class AppService implements OnModuleInit, OnApplicationShutdown {
 
-    constructor(private httpService: HttpService,
-                private hostService: HostService) {
+    constructor(private hostService: HostService) {
     }
 
-    onApplicationBootstrap(): void {
-        this.hostService.setHostOnline();
+    async onModuleInit() {
+        return this.hostService.setHostOnline().toPromise();
     }
 
-    async onApplicationShutdown(signal: string) {
+    async onApplicationShutdown() {
         return this.hostService.setHostOffline()
             .toPromise();
     }

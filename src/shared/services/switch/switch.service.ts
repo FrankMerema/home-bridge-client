@@ -4,7 +4,7 @@ import { createGpio, errorHandler, readPinState, writePinState } from '@shared/h
 import { State, SwitchModel } from '@shared/models';
 import { HostService } from '@shared/service';
 import { Observable, of } from 'rxjs';
-import { map, switchMap, timeout } from 'rxjs/operators';
+import { delay, map, retryWhen, switchMap, tap, timeout } from 'rxjs/operators';
 
 @Injectable()
 export class SwitchService implements OnApplicationBootstrap {
@@ -61,9 +61,13 @@ export class SwitchService implements OnApplicationBootstrap {
     }
 
     private determineInitialState(): void {
-        this.httpService.get(`${this.configService.get('homeServerHost')}:${this.configService.get('homeServerPort')}/api/server/switch/all/${this.hostService.currentHost.id}`)
-            .subscribe(res => {
-                res.data.foreach((s: SwitchModel) => {
+        this.httpService.get(`http://${this.configService.get('homeServerHost')}:${this.configService.get('homeServerPort')}/api/server/switch/all/${this.hostService.currentHost.id}`)
+            .pipe(retryWhen(errors =>
+                errors.pipe(
+                    tap(errorHandler),
+                    delay(2000))))
+            .subscribe(({data}) => {
+                data.foreach((s: SwitchModel) => {
                     createGpio(s.pin, 'out')
                         .pipe(switchMap(gpio => {
                             this.switchList[s.pin] = gpio;
@@ -71,9 +75,6 @@ export class SwitchService implements OnApplicationBootstrap {
                             return writePinState(gpio, s.state);
                         })).subscribe();
                 });
-            }, error => {
-                errorHandler(error);
-                setTimeout(() => this.determineInitialState(), 2000);
             });
     }
 

@@ -1,35 +1,25 @@
 import { ConfigModule } from '@config';
-import { DynamicModule, HttpModule, Module } from '@nestjs/common';
+import { Global, HttpModule, Module } from '@nestjs/common';
 import { HostService } from './host/host.service';
 import { SensorService } from './sensor/sensor.service';
 import { SwitchService } from './switch/switch.service';
 
+@Global()
 @Module({
     imports: [
         ConfigModule,
         HttpModule
+    ],
+    providers: [
+        HostService,
+        SensorService,
+        SwitchService
+    ],
+    exports: [
+        HostService,
+        SensorService,
+        SwitchService
     ]
 })
 export class ServiceModule {
-    static forRoot(): DynamicModule {
-        return {
-            module: ServiceModule,
-            providers: [HostService],
-            exports: [HostService]
-        };
-    }
-
-    static forChild(): DynamicModule {
-        return {
-            module: ServiceModule,
-            providers: [
-                SensorService,
-                SwitchService
-            ],
-            exports: [
-                SensorService,
-                SwitchService
-            ]
-        };
-    }
 }

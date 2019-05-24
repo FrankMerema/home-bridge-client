@@ -4,7 +4,7 @@ import { createGpio, errorHandler, readPinState, watchPinState } from '@shared/h
 import { SensorModel, State } from '@shared/models';
 import { HostService } from '@shared/service';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { delay, map, retryWhen, tap } from 'rxjs/operators';
 
 @Injectable()
 export class SensorService implements OnApplicationBootstrap {
@@ -53,9 +53,13 @@ export class SensorService implements OnApplicationBootstrap {
     }
 
     private determineInitialState(): void {
-        this.httpService.get(`${this.configService.get('homeServerHost')}:${this.configService.get('homeServerPort')}/api/server/sensor/all/${this.hostService.currentHost.id}`)
-            .subscribe(res => {
-                res.data.foreach((s: SensorModel) => {
+        this.httpService.get(`http://${this.configService.get('homeServerHost')}:${this.configService.get('homeServerPort')}/api/server/sensor/all/${this.hostService.currentHost.id}`)
+            .pipe(retryWhen(errors =>
+                errors.pipe(
+                    tap(errorHandler),
+                    delay(2000))))
+            .subscribe(({data}) => {
+                data.foreach((s: SensorModel) => {
                     createGpio(s.pin, 'in', 'both')
                         .subscribe(gpio => {
                             this.sensorList[s.pin] = gpio;
@@ -63,14 +67,11 @@ export class SensorService implements OnApplicationBootstrap {
                             watchPinState(gpio, s.pin, (newValue, pin) => this.stateChanged(newValue, pin));
                         });
                 });
-            }, error => {
-                errorHandler(error);
-                setTimeout(() => this.determineInitialState(), 2000);
             });
     }
 
     private stateChanged(newValue: number, pin: number): void {
-        this.httpService.put(`${this.configService.get('homeServerHost')}:${this.configService.get('homeServerPort')}/api/server/sensor/${this.hostService.currentHost.id}/${pin}`, {state: newValue})
+        this.httpService.put(`http://${this.configService.get('homeServerHost')}:${this.configService.get('homeServerPort')}/api/server/sensor/${this.hostService.currentHost.id}/${pin}`, {state: newValue})
             .subscribe(() => {
                 },
                 errorHandler);
